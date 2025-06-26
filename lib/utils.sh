@@ -2,72 +2,68 @@
 
 start_server()
 {
-    local client_binary="$1"
-    local server_pid="$2"
-    local messages="$3"
-    local timeout="$3"
-    local timeout="${4:-10}"
-
-    log_debug "Running client: PID=${server_pid}, Message='${message}'"
-    timeout "${timeout}" "${client_binary}" "${server_pid}" "${message}" > 2>&1
-    local   exit_code=$?
-    if [[ ${exit_code} -eq 124 ]]; then
-        log_error "Client timed out after ${timeout} seconds"
-        return 1
-    elif [[ ${exit_code} -ne 0 ]]; then
-        log_error "Client failed with exit code: ${exit_code}"
-        return 1
+    if [[ ! -x ${SERVER_BIN} ]]; then
+        log_error "the server bin is not executable"
+        exit 1
     fi
-    return 0
+    # Start the server in the background, redirect output to a file
+    ./${SERVER_BIN} > /tmp/server_output.log 2>&1 &
+    SERVER_BG_PID=$!
+    # Wait a moment for the server to print its PID
+    sleep 0.2
+    # Use robust get_pid to extract the PID
+    SERVER_PID=$(get_pid)
+    if [[ -z "$SERVER_PID" ]]; then
+        log_error "Could not retrieve server PID"
+        kill "$SERVER_BG_PID" 2>/dev/null
+        exit 1
+    fi
+    echo $SERVER_PID > "$PID_FILE"
+    log_info "Started server with PID $SERVER_PID"
 }
 
 stop_server()
 {
-    local server_pid="$1"
-    if [[ -z "${server_pid}" ]]; then
-        log_error "No server PID provided"
-        return 1
+    if [[ -f "$PID_FILE" ]]; then
+        SERVER_PID=$(cat "$PID_FILE")
+        kill -TERM "$SERVER_PID" 2>/dev/null
+        rm -f "$PID_FILE"
+        log_info "Stopped server with PID $SERVER_PID"
+    else
+        log_warning "No PID file found. Server may not be running."
     fi
-    log_debug "Stopping server with PID: ${server_pid}"
-    if kill -TERM "${server_pid}" 2> /dev/null; then
-        local attempts=0
-        while [[ ${attempts} -lt 5 ]]; do
-            if ! kill -0 "${server_pid}" 2>/dev/null; then
-                log_debug "Server stopped gracefully"
-                return 0
-            fi
-            sleep 1
-            ((attempts++))
-        done
-        log_warning "Server didn't stop gracefully, force killing"
-        kill -KILL "${server_pid}" 2>/dev/null
-        else
-            log_debug "Server process not found (PID): ${server_pid}"
-        fi
-        return 0
 }
 
 run_client()
 {
-    local client_binary="$1"
-    local server_pid="$2"
-    local message="$3"
-    local timeout="${4:-10}"
+    local pid_server="$1"
+    local message="$2"
 
-    log_debug "Running client: PID=${server_pid}, Message='${message}'"
-    timeout "${timeout}" "${client_binary}" "${server_pid}" "${message}" 2>&1
-    local exit_codes=$?
-    if [[ ${exit_code} -eq 124 ]], then
-        log_error "Client timed out after ${timeout} seconds"
-        return 1
-    elif [[ ${exit_code} -ne 0 ]]; then
-        log_error "Client failed with exit code: ${exit_code}"
-        return 1
+    if [[ ! -f ${CLIENT_BIN} ]]; then
+        log_error "The file is not found, please compile the minitalk project before"
+        exit 1
     fi
-    return 0
+    CLIENT_OUTPUT=$(${CLIENT_BIN} "${pid_server}" "${message}" 2>&1)
+    CLIENT_STATUS=$?
+    if [[ $CLIENT_STATUS -eq 0 ]]; then
+        log_success "Client ran successfully"
+    else
+        log_error "Client failed with status $CLIENT_STATUS"
+        log_error "Client output: $CLIENT_OUTPUT"
+    fi
 }
 
-generate_random_string()
+get_pid()
 {
-
+    # Try to find a PID in the server output, robust to various formats
+    # Handles: PID: 1234, pid: 1234, PID = 1234, Server PID: 1234, etc.
+    local pid_line
+    pid_line=$(grep -iE 'pid[[:space:]]*[:=][[:space:]]*[0-9]+' /tmp/server_output.log | head -n1)
+    if [[ -z "$pid_line" ]]; then
+        # Try to find a line with just a number (fallback)
+        pid_line=$(grep -E '^[[:space:]]*[0-9]+[[:space:]]*$' /tmp/server_output.log | head -n1)
+    fi
+    local pid
+    pid=$(echo "$pid_line" | grep -oE '[0-9]+')
+    echo "$pid"
 }
