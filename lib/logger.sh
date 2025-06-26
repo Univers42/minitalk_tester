@@ -63,7 +63,9 @@ log_error()
 
 log_warning()
 {
-	_log ${LOG_LEVEL_WARN} "WARNING" "${BOLD_YELLOW}" "${WARNING_SYMBOL}" "$1"
+	if [[ -n "$1" ]]; then
+		_log ${LOG_LEVEL_WARN} "WARNING" "${BOLD_YELLOW}" "${WARNING_SYMBOL}" "$1"
+	fi
 }
 
 log_info()
