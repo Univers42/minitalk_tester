@@ -8,7 +8,7 @@ start_server()
     local timeout="$3"
     local timeout="${4:-10}"
 
-    local_debug "Running client: PID=${server_pid}, Message='${message}'"
+    log_debug "Running client: PID=${server_pid}, Message='${message}'"
     timeout "${timeout}" "${client_binary}" "${server_pid}" "${message}" > 2>&1
     local   exit_code=$?
     if [[ ${exit_code} -eq 124 ]]; then

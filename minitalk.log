@@ -1,0 +1,27 @@
+[2025-06-26 21:10:09] [INFO] Log level set to: info
+[2025-06-26 21:10:09] [INFO] Started server with PID 2693278
+[2025-06-26 21:10:10] [INFO] Started server with PID 2693295
+[2025-06-26 21:10:10] [ERROR] The file is not found, please compile the minitalk project before
+[2025-06-26 21:10:27] [INFO] Log level set to: info
+[2025-06-26 21:10:27] [INFO] Started server with PID 2694837
+[2025-06-26 21:10:27] [INFO] Started server with PID 2694845
+[2025-06-26 21:11:31] [INFO] Log level set to: info
+[2025-06-26 21:11:31] [INFO] Started server with PID 2700378
+[2025-06-26 21:12:21] [INFO] Log level set to: info
+[2025-06-26 21:12:21] [INFO] Started server with PID 2704760
+[2025-06-26 21:12:21] [SUCCESS] Client ran successfully
+[2025-06-26 21:13:45] [INFO] Log level set to: info
+[2025-06-26 21:13:45] [INFO] Started server with PID 2712110
+[2025-06-26 21:13:45] [SUCCESS] Client ran successfully
+[2025-06-26 21:13:45] [SUCCESS] Server received the correct message: 'just a message'
+[2025-06-26 21:13:45] [INFO] Stopped server with PID 2712110
+[2025-06-26 21:14:39] [INFO] Log level set to: info
+[2025-06-26 21:14:39] [INFO] Started server with PID 2716768
+[2025-06-26 21:14:39] [SUCCESS] Client ran successfully
+[2025-06-26 21:14:39] [SUCCESS] Server received the correct message: 'hello'
+[2025-06-26 21:14:39] [INFO] Stopped server with PID 2716768
+[2025-06-26 21:14:47] [INFO] Log level set to: info
+[2025-06-26 21:14:47] [INFO] Started server with PID 2717580
+[2025-06-26 21:14:47] [SUCCESS] Client ran successfully
+[2025-06-26 21:14:47] [SUCCESS] Server received the correct message: 'hello my name is dylan'
+[2025-06-26 21:14:47] [INFO] Stopped server with PID 2717580

@@ -6,7 +6,7 @@
 #    By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/26 15:40:31 by dlesieur          #+#    #+#              #
-#    Updated: 2025/06/26 16:52:18 by dlesieur         ###   ########.fr        #
+#    Updated: 2025/06/26 19:27:43 by dlesieur         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@
 # with script_dir it is :
 # /path/to/
 # ! best practice for portable bash script
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Source configuration and libraries
 # source work like includes we includes the files
@@ -179,7 +179,7 @@ run_test_suites()
 	local	failed_tests=0
 
 	log_header "Starting Test Execution..."
-	if [[ "${RUN_ALL}" == true]] || [[ "${RUN_BASICS}" == true ]]; then
+	if [[ "${RUN_ALL}" == true ]] || [[ "${RUN_BASICS}" == true ]]; then
 		log_info "Running basic tests..."
 		source "${SCRIPT_DIR}/tests/basic_tests.sh"
 		run_basic_tests
@@ -243,12 +243,12 @@ generate_summary()
 main()
 {
 	parse_arguments "$@"
-	if [[ ${CLEAN_ONLY} == true]]; then
+	if [[ ${CLEAN_ONLY} == true ]]; then
 		clean_results
 		exit 0
 	fi
-	setup_environments
-	check_prerequisites
+	setup_environment
+	check_prerequesites
 	run_test_suites
 }
 

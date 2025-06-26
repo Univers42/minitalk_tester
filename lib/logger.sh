@@ -10,14 +10,32 @@ CURRENT_LOG_LEVEL=${LOG_LEVEL_INFO}
 
 #set the log file name with main script
 
+# Define color variables if not already defined
+RESET="\033[0m"
+BOLD="\033[1m"
+BOLD_RED="\033[1;31m"
+BOLD_GREEN="\033[1;32m"
+BOLD_YELLOW="\033[1;33m"
+BOLD_BLUE="\033[1;34m"
+BOLD_CYAN="\033[1;36m"
+GRAY="\033[0;37m"
+RED="\033[0;31m"
+
+# Define symbols if not already defined
+FAILURE_SYMBOL="✗"
+WARNING_SYMBOL="!"
+INFO_SYMBOL="ℹ"
+SUCCESS_SYMBOL="✔"
+PASS="✔"
+FAIL="✗"
+
+# Set default log file if not set
+: "${LOG_FILE:=minitalk.log}"
+
 # ============================================================== #
 # LOGGING INITIALIZATION                                         #
 # ============================================================== #
 
-init_logging()
-{
-
-}
 
 # ============================================================= #
 # FORMAT LOG MESSAGES											#
@@ -30,7 +48,7 @@ _log()
 	local color=$3
 	local symbol=$4
 	local message="$5"
-	local timestamp=$(data '+%Y-%m-%d %H:%M:%S')
+	local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
 
 	if [[ ${level} -le ${CURRENT_LOG_LEVEL} ]]; then
 		echo -e "${symbol} ${color}${message}${RESET}"
@@ -40,27 +58,27 @@ _log()
 
 log_error()
 {
-	_log ${LOG_LEVEL_ERR} "ERROR" "${BOLD_RED}" "${FAILURE_SYMBOL}" "$1"
+	_log ${LOG_LEVEL_ERROR} "ERROR" "${BOLD_RED}" "${FAILURE_SYMBOL}" "$1"
 }
 
 log_warning()
 {
-	_log ${LOG_LEVEL_WARN} "WARNING" ${BOLD_YELLOW} "${WARNING_SYMBOL}" "$1"
+	_log ${LOG_LEVEL_WARN} "WARNING" "${BOLD_YELLOW}" "${WARNING_SYMBOL}" "$1"
 }
 
 log_info()
 {
-	_log ${LOG_LEVEL_INFO} "WARNING" $(BOLD_BLUE) "${INFO_SYMBOL}" "$1"
+	_log ${LOG_LEVEL_INFO} "INFO" "${BOLD_BLUE}" "${INFO_SYMBOL}" "$1"
 }
 
 log_debug()
 {
-	_log $(LOG_LEVEL_DEBUG) "DEBUG" ${GRAY} ${INFO_SYMBOL} "$1" 
+	_log ${LOG_LEVEL_DEBUG} "DEBUG" "${GRAY}" "${INFO_SYMBOL}" "$1" 
 }
 
 log_success()
 {
-	_log $(LOG_LEVEL_SUCCESS) "SUCCESS" "${BOLD_GREEN}" "${SUCCESS_SYMBOL}" "$1"
+	_log ${LOG_LEVEL_INFO} "SUCCESS" "${BOLD_GREEN}" "${SUCCESS_SYMBOL}" "$1"
 }
 
 # ===================================================================== #
@@ -187,10 +205,10 @@ set_log_level()
 get_log_level()
 {
 	case ${CURRENT_LOG_LEVEL} in
-		${LOG_LEVEL_ERROR} echo "ERROR" ;;
-		${LOG_LEVEL_WARN} echo "WARN" ;;
-		${LOG_LEVEL_INFO} echo "INFO" ;;
-		$(LOG_LEVEL_DEBUG) echo "DEBUG" ;;
+		${LOG_LEVEL_ERROR}) echo "ERROR" ;;
+		${LOG_LEVEL_WARN}) echo "WARN" ;;
+		${LOG_LEVEL_INFO}) echo "INFO" ;;
+		${LOG_LEVEL_DEBUG}) echo "DEBUG" ;;
 		*) echo "UNKNOWN" ;;
 	esac
 }
