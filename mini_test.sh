@@ -73,7 +73,46 @@ get_pid()
     fi
 }
 
+check_valgrind_leaks()
+{
+    local bin="$1"
+    shift
+    local valgrind_log="/tmp/valgrind_output.log"
+    local valgrind_save="/tmp/valgrind_$(basename "$bin").log"
 
+    if ! command -v valgrind >/dev/null 2>&1; then
+        log_warning "Valgrind is not installed, skipping leak check."
+        return
+    fi
+
+    valgrind --leak-check=full --track-origins=yes --error-exitcode=42 "$bin" "$@" > /dev/null 2> "$valgrind_log"
+
+    # Check for leaks summary
+    local leaks_found=0
+    if grep -q "definitely lost: [^0]" "$valgrind_log"; then
+        log_error "Memory leaks detected by valgrind in $bin:"
+        grep "definitely lost:" "$valgrind_log" | log_error
+        grep "indirectly lost:" "$valgrind_log" | log_error
+        grep "LEAK SUMMARY:" -A 5 "$valgrind_log" | log_error
+        leaks_found=1
+    fi
+
+    # Check for any errors (not just leaks)
+    if grep -q "ERROR SUMMARY: [1-9][0-9]* errors" "$valgrind_log"; then
+        log_error "Valgrind detected errors in $bin:"
+        grep "ERROR SUMMARY:" "$valgrind_log" | log_error
+        # Optionally, print the relevant error lines:
+        grep -A 5 "ERROR SUMMARY:" "$valgrind_log" | log_error
+        leaks_found=1
+    fi
+
+    if [[ $leaks_found -eq 0 ]]; then
+        log_info "Valgrind found no memory leaks or errors in $bin."
+    else
+        cp "$valgrind_log" "$valgrind_save"
+        log_info "Full valgrind log saved to $valgrind_save"
+    fi
+}
 
 main()
 {
@@ -82,6 +121,9 @@ main()
     start_server 
     local PID_SERVER=$(get_pid)
     run_client "${PID_SERVER}" "${MESSAGE}"
+
+    # Pass arguments as separate parameters
+    check_valgrind_leaks "${CLIENT_BIN}" "${PID_SERVER}" "${MESSAGE}"
 
     # Check server output for the received message
     local RECEIVED_MSG

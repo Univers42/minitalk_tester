@@ -25,3 +25,50 @@
 [2025-06-26 21:14:47] [SUCCESS] Client ran successfully
 [2025-06-26 21:14:47] [SUCCESS] Server received the correct message: 'hello my name is dylan'
 [2025-06-26 21:14:47] [INFO] Stopped server with PID 2717580
+[2025-06-26 21:28:55] [INFO] Log level set to: info
+[2025-06-26 21:28:55] [INFO] Started server with PID 2789962
+[2025-06-26 21:28:55] [SUCCESS] Client ran successfully
+[2025-06-26 21:28:55] [SUCCESS] Server received the correct message: 'hello my name is dylan'
+[2025-06-26 21:28:55] [INFO] Stopped server with PID 2789962
+[2025-06-26 21:29:54] [INFO] Log level set to: info
+[2025-06-26 21:29:54] [INFO] Started server with PID 2795135
+[2025-06-26 21:29:54] [SUCCESS] Client ran successfully
+[2025-06-26 21:29:56] [SUCCESS] Server received the correct message: 'hello my name is dylan'
+[2025-06-26 21:29:56] [INFO] Stopped server with PID 2795135
+[2025-06-26 21:30:21] [INFO] Log level set to: info
+[2025-06-26 21:30:21] [INFO] Started server with PID 2797717
+[2025-06-26 21:30:21] [SUCCESS] Client ran successfully
+[2025-06-26 21:30:21] [SUCCESS] Server received the correct message: 'hello my name is dylan'
+[2025-06-26 21:30:21] [INFO] Stopped server with PID 2797717
+[2025-06-26 21:31:30] [INFO] Log level set to: info
+[2025-06-26 21:31:30] [INFO] Started server with PID 2803835
+[2025-06-26 21:31:30] [SUCCESS] Client ran successfully
+[2025-06-26 21:31:31] [INFO] Valgrind found no memory leaks in ../client.
+[2025-06-26 21:31:31] [SUCCESS] Server received the correct message: 'hello my name is dylan'
+[2025-06-26 21:31:31] [INFO] Stopped server with PID 2803835
+[2025-06-26 21:34:04] [INFO] Log level set to: info
+[2025-06-26 21:34:04] [INFO] Started server with PID 2817222
+[2025-06-26 21:34:04] [SUCCESS] Client ran successfully
+[2025-06-26 21:34:04] [ERROR] Valgrind detected errors in ../client:
+[2025-06-26 21:34:04] [ERROR] 
+[2025-06-26 21:34:04] [ERROR] 
+[2025-06-26 21:34:04] [SUCCESS] Server received the correct message: 'hello my name is dylan'
+[2025-06-26 21:34:04] [INFO] Stopped server with PID 2817222
+[2025-06-26 21:35:01] [INFO] Log level set to: info
+[2025-06-26 21:35:02] [INFO] Started server with PID 2822277
+[2025-06-26 21:35:02] [SUCCESS] Client ran successfully
+[2025-06-26 21:35:02] [ERROR] Valgrind detected errors in ../client:
+[2025-06-26 21:35:02] [ERROR] 
+[2025-06-26 21:35:02] [ERROR] 
+[2025-06-26 21:35:02] [INFO] Full valgrind log saved to /tmp/valgrind_client.log
+[2025-06-26 21:35:02] [SUCCESS] Server received the correct message: 'hello my name is dylan'
+[2025-06-26 21:35:02] [INFO] Stopped server with PID 2822277
+[2025-06-26 21:36:28] [INFO] Log level set to: info
+[2025-06-26 21:36:28] [INFO] Started server with PID 2829812
+[2025-06-26 21:36:28] [SUCCESS] Client ran successfully
+[2025-06-26 21:36:28] [ERROR] Valgrind detected errors in ../client:
+[2025-06-26 21:36:28] [ERROR] 
+[2025-06-26 21:36:28] [ERROR] 
+[2025-06-26 21:36:28] [INFO] Full valgrind log saved to /tmp/valgrind_client.log
+[2025-06-26 21:36:28] [SUCCESS] Server received the correct message: 'hello my name is dylan'
+[2025-06-26 21:36:28] [INFO] Stopped server with PID 2829812
