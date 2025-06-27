@@ -43,11 +43,17 @@ message() {
     # Check server output
     if [[ -s /tmp/server_output.log ]]; then
         local RECEIVED_MSG
-        # Try both "Received message: ..." and "Received: ..." patterns
-        RECEIVED_MSG=$(grep -oP 'Received message: \K.*' /tmp/server_output.log | head -n1)
-        if [[ -z "$RECEIVED_MSG" ]]; then
-            RECEIVED_MSG=$(grep -oP 'Received: \K.*' /tmp/server_output.log | head -n1)
-        fi
+        # Extract only the last occurrence of the received message
+        RECEIVED_MSG=$(awk '
+            match($0, /^Received message: /) {
+                msg = substr($0, RSTART + RLENGTH)
+            }
+            match($0, /^Received: /) {
+                msg = substr($0, RSTART + RLENGTH)
+            }
+            END { if (msg) print msg }
+        ' /tmp/server_output.log)
+        RECEIVED_MSG="${RECEIVED_MSG%$'\n'}"
         if [[ "$RECEIVED_MSG" == "$custom_message" ]]; then
             log_success "Server received the correct message: '$RECEIVED_MSG'"
         else
@@ -58,4 +64,5 @@ message() {
     fi
     stop_server
 }
+
 

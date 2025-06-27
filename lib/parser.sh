@@ -14,6 +14,7 @@ parse_arguments()
 	CLIENT_BINARY=""
 	SHOW_USAGE=false
 	RUN_TESTER_MINITALK=false
+	PERFORMANCE_MODE=false
 
 	while [[ $# -gt 0 ]]; do
 		case $1 in
@@ -40,6 +41,7 @@ parse_arguments()
 				;;
 			-p|--performance)
 				RUN_PERFORMANCE=true
+				PERFORMANCE_MODE=true
 				shift
 				;;
 			-a|--all)
@@ -64,6 +66,11 @@ parse_arguments()
 				;;
 			-tm|--tester-minitalk)
 				RUN_TESTER_MINITALK=true
+				shift
+				;;
+			-tmp|--tester-minitalk-performance)
+				RUN_TESTER_MINITALK=true
+				PERFORMANCE_MODE=true
 				shift
 				;;
 			*)

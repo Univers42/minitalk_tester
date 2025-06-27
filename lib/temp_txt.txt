@@ -1,9 +1,0 @@
-✗ Server did not receive the correct message. Got: 'fumction test()', expected: 'function test()'
-
-✗ Server did not receive the correct message. Got: 'Distributed systems require careful considerarion of consistency and availability', expected: 'Distributed systems require careful consideration of consistency and availability'
-
-
-✔ Client ran successfully
-✗ Server did not receive the correct message. Got: 'Macdine learning models process vast amounts of data to identify patterns', expected: 'Machine learning models process vast amounts of data to identify patterns'
-
-✗ Server did not receive the correct message. Got: '零一二三՛', expected: '零一二三四五六七八九'

@@ -25,6 +25,11 @@ tester_minitalk()
     local passed=0
     local failed=0
 
+    # Performance mode variables
+    local perf_count=0
+    local perf_total_time=0
+    local perf_total_chars=0
+
     if [[ ! -f "$messages_file" ]]; then
         log_error "Messages file not found: $messages_file"
         return 1
@@ -35,8 +40,20 @@ tester_minitalk()
         [[ -z "$line" || "${line:0:1}" == "#" ]] && continue
         ((total++))
         log_info "Testing message: '$line'"
-        # Use the message function to test
-        message "$line"
+
+        if [[ "$PERFORMANCE_MODE" == true && ${#line} -gt 100 ]]; then
+            local start_time=$(date +%s.%N)
+            message "$line"
+            local end_time=$(date +%s.%N)
+            # Calculate elapsed time in seconds (float)
+            local elapsed=$(echo "$end_time - $start_time" | bc)
+            perf_total_time=$(echo "$perf_total_time + $elapsed" | bc)
+            perf_total_chars=$(echo "$perf_total_chars + ${#line}" | bc)
+            ((perf_count++))
+        else
+            message "$line"
+        fi
+
         # Check last log for success/failure
         if tail -n 5 "${LOG_FILE}" | grep -q "Server received the correct message"; then
             ((passed++))
@@ -50,6 +67,14 @@ tester_minitalk()
     log_success "Passed: $passed"
     if [[ $failed -gt 0 ]]; then
         log_error "Failed: $failed"
+    fi
+
+    if [[ "$PERFORMANCE_MODE" == true && $perf_count -gt 0 ]]; then
+        local avg_time=$(echo "scale=6; $perf_total_time / $perf_count" | bc)
+        local avg_chars=$(echo "scale=2; $perf_total_chars / $perf_count" | bc)
+        log_info "Performance: Average time for messages >100 chars: ${avg_time}s over $perf_count messages"
+        log_info "Performance: Average characters per message >100 chars: ${avg_chars}"
+        log_info "Performance: Average time per character: $(echo "scale=8; $avg_time / $avg_chars" | bc)s"
     fi
 }
 
@@ -99,11 +124,17 @@ main()
 	# Only check server output if the output file exists and is not empty
 	if [[ -s /tmp/server_output.log ]]; then
 		local RECEIVED_MSG
-		# Try both "Received message: ..." and "Received: ..." patterns
-		RECEIVED_MSG=$(grep -oP 'Received message: \K.*' /tmp/server_output.log | head -n1)
-		if [[ -z "$RECEIVED_MSG" ]]; then
-			RECEIVED_MSG=$(grep -oP 'Received: \K.*' /tmp/server_output.log | head -n1)
-		fi
+		# Extract only the last occurrence of the received message
+		RECEIVED_MSG=$(awk '
+			match($0, /^Received message: /) {
+				msg = substr($0, RSTART + RLENGTH)
+			}
+			match($0, /^Received: /) {
+				msg = substr($0, RSTART + RLENGTH)
+			}
+			END { if (msg) print msg }
+		' /tmp/server_output.log)
+		RECEIVED_MSG="${RECEIVED_MSG%$'\n'}"
 		if [[ "$RECEIVED_MSG" == "$MESSAGE" ]]; then
 			log_success "Server received the correct message: '$RECEIVED_MSG'"
 		else

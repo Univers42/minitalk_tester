@@ -1,5 +1,6 @@
 #!bin/bash
 
+AWAIT_SERVER=0.01
 start_server()
 {
     if [[ ! -x ${SERVER_BIN} ]]; then
@@ -10,7 +11,7 @@ start_server()
     ./${SERVER_BIN} > /tmp/server_output.log 2>&1 &
     SERVER_BG_PID=$!
     # Wait a moment for the server to print its PID
-    sleep 0.2
+    sleep ${AWAIT_SERVER}
     # Use robust get_pid to extract the PID
     SERVER_PID=$(get_pid)
     if [[ -z "$SERVER_PID" ]]; then
