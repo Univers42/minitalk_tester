@@ -41,9 +41,19 @@ tester_minitalk()
         ((total++))
         log_info "Testing message: '$line'"
 
+        # --- Clear server output log before each test ---
+        : > /tmp/server_output.log
+
+        # --- Start server for each test ---
+        start_server
+        local PID_SERVER=$(get_pid)
+
+        # --- Wait for server to be ready ---
+        sleep 0.05
+
         if [[ "$PERFORMANCE_MODE" == true && ${#line} -gt 100 ]]; then
             local start_time=$(date +%s.%N)
-            message "$line"
+            run_client "${PID_SERVER}" "$line"
             local end_time=$(date +%s.%N)
             # Calculate elapsed time in seconds (float)
             local elapsed=$(echo "$end_time - $start_time" | bc)
@@ -51,15 +61,32 @@ tester_minitalk()
             perf_total_chars=$(echo "$perf_total_chars + ${#line}" | bc)
             ((perf_count++))
         else
-            message "$line"
+            run_client "${PID_SERVER}" "$line"
         fi
 
-        # Check last log for success/failure
-        if tail -n 5 "${LOG_FILE}" | grep -q "Server received the correct message"; then
-            ((passed++))
+        # --- Wait a moment for server to print output ---
+        sleep 0.05
+
+        # Only check server output if the output file exists and is not empty
+        if [[ -s /tmp/server_output.log ]]; then
+            local RECEIVED_MSG
+            RECEIVED_MSG=$(get_message_from_output "$(cat /tmp/server_output.log)")
+            RECEIVED_MSG="${RECEIVED_MSG%$'\n'}"
+            if [[ "$RECEIVED_MSG" == "$line" ]]; then
+                log_success "Server received the correct message: '$RECEIVED_MSG'"
+                ((passed++))
+            else
+                log_error "Server did not receive the correct message. Got: '$RECEIVED_MSG', expected: '$line'"
+                ((failed++))
+            fi
         else
+            log_error "Server did not receive the correct message. Got: '', expected: '$line'"
             ((failed++))
         fi
+
+        # --- Stop server after each test ---
+        stop_server
+
     done < "$messages_file"
 
     log_section "tester_minitalk summary"
@@ -124,16 +151,8 @@ main()
 	# Only check server output if the output file exists and is not empty
 	if [[ -s /tmp/server_output.log ]]; then
 		local RECEIVED_MSG
-		# Extract only the last occurrence of the received message
-		RECEIVED_MSG=$(awk '
-			match($0, /^Received message: /) {
-				msg = substr($0, RSTART + RLENGTH)
-			}
-			match($0, /^Received: /) {
-				msg = substr($0, RSTART + RLENGTH)
-			}
-			END { if (msg) print msg }
-		' /tmp/server_output.log)
+		# Use the parser function to extract the message
+		RECEIVED_MSG=$(get_message_from_output "$(cat /tmp/server_output.log)")
 		RECEIVED_MSG="${RECEIVED_MSG%$'\n'}"
 		if [[ "$RECEIVED_MSG" == "$MESSAGE" ]]; then
 			log_success "Server received the correct message: '$RECEIVED_MSG'"

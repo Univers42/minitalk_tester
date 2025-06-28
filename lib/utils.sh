@@ -56,15 +56,8 @@ run_client()
 
 get_pid()
 {
-    # Try to find a PID in the server output, robust to various formats
-    # Handles: PID: 1234, pid: 1234, PID = 1234, Server PID: 1234, etc.
-    local pid_line
-    pid_line=$(grep -iE 'pid[[:space:]]*[:=][[:space:]]*[0-9]+' /tmp/server_output.log | head -n1)
-    if [[ -z "$pid_line" ]]; then
-        # Try to find a line with just a number (fallback)
-        pid_line=$(grep -E '^[[:space:]]*[0-9]+[[:space:]]*$' /tmp/server_output.log | head -n1)
-    fi
-    local pid
-    pid=$(echo "$pid_line" | grep -oE '[0-9]+')
-    echo "$pid"
+    # Read the last 10 lines of the server log/output to find the PID
+    local output
+    output=$(tail -n 10 /tmp/server_output.log 2>/dev/null)
+    get_pid_from_output "$output"
 }
