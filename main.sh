@@ -106,6 +106,24 @@ tester_minitalk()
     fi
 }
 
+start_server()
+{
+    # Ignore SIGINT in the subshell so the server doesn't get killed
+    (
+        trap '' SIGINT
+        ./${SERVER_BIN} > /tmp/server_output.log 2>&1 &
+        echo $! > "$PID_FILE"
+    )
+    sleep ${AWAIT_SERVER}
+    SERVER_PID=$(get_pid)
+    if [[ -z "$SERVER_PID" ]]; then
+        log_error "Could not retrieve server PID"
+        kill "$SERVER_BG_PID" 2>/dev/null
+        exit 1
+    fi
+    log_info "Started server with PID $SERVER_PID"
+}
+
 main()
 {
 	parse_arguments "$@"
